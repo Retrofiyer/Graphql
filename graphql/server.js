@@ -8,21 +8,16 @@ const resolvers = require('./resolvers');
 const PORT = 5225;
 const app = express();
 
-// Middleware to parse JSON
 app.use(express.json());
 
-// Static file serving
 app.use(express.static(path.join(__dirname, '../css')));
 
-// GraphQL endpoint
 app.use('/graphql', createHandler({ schema, rootValue: resolvers }));
 
-// Serve index.html
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../index.html'));
 });
 
-// Load users from db.json
 function loadUsers() {
   try {
     const data = fs.readFileSync(path.join(__dirname, '../db.json'), 'utf8');
@@ -33,7 +28,6 @@ function loadUsers() {
   }
 }
 
-// Save users to db.json
 function saveUsers(users) {
   try {
     fs.writeFileSync(path.join(__dirname, '../db.json'), JSON.stringify(users, null, 2), 'utf8');
@@ -42,12 +36,10 @@ function saveUsers(users) {
   }
 }
 
-// Initialize users
 const users = loadUsers();
 resolvers.initUsers(users);
 
-// Endpoint to add user
-app.post('/add-user', (req, res) => {
+app.post('/usuario', (req, res) => {
   const { name, age } = req.body;
   const query = `
     mutation {
@@ -84,7 +76,6 @@ app.post('/add-user', (req, res) => {
     });
 });
 
-// Start the server
 app.listen(PORT, () => {
   console.log(`Servidor escuchando en el puerto ${PORT}...`);
 });

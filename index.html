@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GraphQL Example</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="container mt-5">
+    <h1 class="mb-4">GraphQL Example</h1>
+
+    <div class="card mb-4">
+      <div class="card-header">
+        <h2>Add User</h2>
+      </div>
+      <div class="card-body">
+        <form id="addUserForm">
+          <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" id="name" class="form-control" placeholder="Enter name" required>
+          </div>
+          <div class="form-group">
+            <label for="age">Age</label>
+            <input type="number" id="age" class="form-control" placeholder="Enter age" required>
+          </div>
+          <button type="submit" class="btn btn-primary">Add User</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h2>Users</h2>
+      </div>
+      <div class="card-body">
+        <button id="loadUsersButton" class="btn btn-secondary mb-3">Load Users</button>
+        <ul id="userList" class="list-group"></ul>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const graphQLFetcher = (graphQLParams) => {
+      return fetch('/graphql', {
+        method: 'post',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(graphQLParams),
+      }).then(response => response.json());
+    };
+
+    document.getElementById('addUserForm').addEventListener('submit', function (event) {
+      event.preventDefault();
+      const name = document.getElementById('name').value;
+      const age = parseInt(document.getElementById('age').value, 10);
+
+      const query = `
+        mutation {
+          addUser(name: "${name}", age: ${age}) {
+            id
+            name
+            age
+          }
+        }
+      `;
+
+      graphQLFetcher({ query })
+        .then(data => {
+          if (data.errors) {
+            console.error(data.errors);
+            alert('Failed to add user');
+          } else {
+            alert('User added successfully');
+            document.getElementById('addUserForm').reset();
+          }
+        })
+        .catch(error => {
+          console.error('Error adding user:', error);
+          alert('Failed to add user');
+        });
+    });
+
+    document.getElementById('loadUsersButton').addEventListener('click', function () {
+      const query = `
+        query {
+          users {
+            id
+            name
+            age
+          }
+        }
+      `;
+
+      graphQLFetcher({ query })
+        .then(data => {
+          if (data.errors) {
+            console.error(data.errors);
+          } else {
+            const userList = document.getElementById('userList');
+            userList.innerHTML = '';
+            data.data.users.forEach(user => {
+              const listItem = document.createElement('li');
+              listItem.className = 'list-group-item';
+              listItem.textContent = `${user.name} (${user.age})`;
+              userList.appendChild(listItem);
+            });
+          }
+        })
+        .catch(error => {
+          console.error('Error loading users:', error);
+        });
+    });
+  </script>
+</body>
+</html>

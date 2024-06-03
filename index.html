@@ -69,15 +69,15 @@
         .then(data => {
           if (data.errors) {
             console.error(data.errors);
-            alert('Failed to add user');
+            alert('Falla al Agregar un Usuario');
           } else {
-            alert('User added successfully');
+            alert('Usuario Agregado correctamente');
             document.getElementById('addUserForm').reset();
           }
         })
         .catch(error => {
           console.error('Error adding user:', error);
-          alert('Failed to add user');
+          alert('Falla al Agregar un Usuario');
         });
     });
 

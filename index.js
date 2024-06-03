@@ -1,26 +1,29 @@
 const express = require('express');
 const path = require('path');
 const { createHandler } = require('graphql-http/lib/use/express');
+const expressPlayground = require('graphql-playground-middleware-express').default;
 const fs = require('fs');
-const schema = require('./schema');
-const resolvers = require('./resolvers');
+const schema = require('./graphql/schema');
+const resolvers = require('./graphql/resolvers');
 
 const PORT = 5225;
 const app = express();
 
 app.use(express.json());
 
-app.use(express.static(path.join(__dirname, '../css')));
+app.use(express.static(path.join(__dirname, './css')));
 
 app.use('/graphql', createHandler({ schema, rootValue: resolvers }));
 
+app.get('/playground', expressPlayground({ endpoint: '/graphql' }));
+
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '../index.html'));
+  res.sendFile(path.join(__dirname, './index.html'));
 });
 
 function loadUsers() {
   try {
-    const data = fs.readFileSync(path.join(__dirname, '../db.json'), 'utf8');
+    const data = fs.readFileSync(path.join(__dirname, './db.json'), 'utf8');
     return JSON.parse(data);
   } catch (err) {
     console.error('Error reading db.json:', err);
@@ -30,7 +33,7 @@ function loadUsers() {
 
 function saveUsers(users) {
   try {
-    fs.writeFileSync(path.join(__dirname, '../db.json'), JSON.stringify(users, null, 2), 'utf8');
+    fs.writeFileSync(path.join(__dirname, './db.json'), JSON.stringify(users, null, 2), 'utf8');
   } catch (err) {
     console.error('Error writing to db.json:', err);
   }

@@ -15,7 +15,7 @@ app.use(express.static(path.join(__dirname, './css')));
 
 app.use('/graphql', createHandler({ schema, rootValue: resolvers }));
 
-app.get('/playground', expressPlayground({ endpoint: '/graphql' }));
+app.get('/graphiql', expressPlayground({ endpoint: '/graphql' }));
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, './index.html'));

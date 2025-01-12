@@ -2,14 +2,11 @@ const fs = require('fs');
 const path = require('path');
 
 function loadUsers() {
-  try {
-    const data = fs.readFileSync(path.join(__dirname, '../db/db.json'), 'utf8');
-    return JSON.parse(data);
-  } catch (err) {
-    console.error('Error reading db.json:', err);
-    return [];
-  }
+  const filePath = path.join(__dirname, '../db/db.json');
+  return JSON.parse(fs.readFileSync(filePath, 'utf-8'));
 }
+
+module.exports = { loadUsers };
 
 function saveUsers(users) {
   try {

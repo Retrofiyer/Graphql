@@ -1,7 +1,9 @@
 const express = require('express');
 const path = require('path');
-const graphqlRoutes = require('./routes/graphql');
-const usuarioRoutes = require('./routes/user');
+const graphqlHandler = require('./routes/graphql');
+const userRoutes = require('./routes/user');
+const resolvers = require('./graphql/resolvers/resolvers');
+const { loadUsers } = require('./utils/db');
 
 const PORT = 5225;
 const app = express();
@@ -9,18 +11,16 @@ const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Rutas
-app.use('/graphql', graphqlRoutes);
-app.use('/usuario', usuarioRoutes);
+const initialUsers = loadUsers();
+resolvers.initUsers(initialUsers);
 
-app.get('/graphiql', (req, res) => {
-  res.redirect('/graphql/playground');
-});
+app.use('/graphql', graphqlHandler);
+app.use('/api/users', userRoutes);
 
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, './public/view/index.html'));
+  res.sendFile(path.join(__dirname, 'public/view/index.html'));
 });
 
 app.listen(PORT, () => {
-  console.log(`Servidor escuchando en el puerto ${PORT}...`);
+  console.log(`Servidor escuchando en el puerto ${PORT}`);
 });
